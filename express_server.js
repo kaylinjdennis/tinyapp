@@ -72,7 +72,6 @@ app.get('/urls/:shortURL', (req, res) => {
 
 app.get('/urls', (req, res) => {
   const templateVars = { username: req.cookies['username'], urls: urlDatabase };
-  console.log('templateVars:', templateVars);
   res.render('urls_index', templateVars);
 });
 
@@ -82,6 +81,11 @@ app.get('/urls.json', (req, res) => {
 
 app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World</b></body></html>\n');
+});
+
+app.get('/register', (req, res) => {
+  const templateVars = { username: req.cookies['username'], urls: urlDatabase };
+  res.render('register', templateVars);
 });
 
 app.get('/u/:shortURL', (req, res) => {
