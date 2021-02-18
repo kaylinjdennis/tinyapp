@@ -36,6 +36,15 @@ const generateRandomString = () => {
   return result;
 };
 
+const emailInUsers = (findEmail) => {
+  for (let user in users) {
+    if (user.email === findEmail) {
+      return true;
+    }
+  }
+  return false;
+};
+
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
@@ -66,15 +75,22 @@ app.post('/logout', (req, res) => {
 
 app.post('/register', (req, res) => {
   const newUserID = generateRandomString();
-  const newUser = {
-    id: newUserID,
-    email: req.body.email,
-    password: req.body.password
-    
-  };
-  users[newUserID] = newUser;
-  res.cookie('user_id', newUserID);
-  res.redirect('/urls');
+  if (req.body.email === '' || req.body.password === '') {
+    res.statusCode = 400;
+    throw new Error(`Email or password field left empty.\nStatus code: ${res.statusCode}`);
+  } else if (emailInUsers(req.body.email)) {
+    res.statusCode = 400;
+    throw new Error(`There is already an account associated with this email.\nStatus code: ${res.statusCode}`);
+  } else {
+    const newUser = {
+      id: newUserID,
+      email: req.body.email,
+      password: req.body.password
+    };
+    users[newUserID] = newUser;
+    res.cookie('user_id', newUserID);
+    res.redirect('/urls');
+  }
 });
 
 app.get('/', (req, res) => {
