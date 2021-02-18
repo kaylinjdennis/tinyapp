@@ -38,7 +38,7 @@ const generateRandomString = () => {
 
 const emailInUsers = (findEmail) => {
   for (let user in users) {
-    if (user.email === findEmail) {
+    if (users[user].email === findEmail) {
       return true;
     }
   }
@@ -65,6 +65,23 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let userID;
+  if (!emailInUsers(email)) {
+    res.statusCode = 403;
+    throw new Error(`No account associated with email.\nStatus code: ${res.statusCode}`);
+  }
+  for (let user in users) {
+    if (users[user]['email'] === email) {
+      userID = user;
+    }
+  }
+  if (password !== users[userID].password) {
+    res.statusCode = 403;
+    throw new Error(`Incorrect Email or Password.\nStatus code: ${res.statusCode}`);
+  }
+  res.cookie('user_id', userID);
   res.redirect('/urls');
 });
 
