@@ -14,17 +14,18 @@
 			</div>
 		</div>
 		<% if(username) { %>
-			<%= username %>
-				<form class="form-inline" action="/logout" method="post" style="text-align:right;">
-					<button class="btn btn-default" type="submit" style="border-color:black">Logout</button>
+			<div class="navbar-nav">
+				<a class="nav-item">Logged In As: <%= username %>! &nbsp&nbsp</a>
+			</div>
+			<form class="form-inline" action="/logout" method="post" style="text-align:right;">
+				<button class="btn btn-default" type="submit" style="border-color:black">Logout</button>
+			</form>
+			<% } else { %>
+				<form class="form-inline" action="/login" method="post" style="text-align:right;">
+					<input class="form-control mr-sm-2" name="username" id="username" type="text" placeholder="Username"
+						style="width: 200px" />
+					<button class="btn btn-default" type="submit" style="border-color:black">Login</button>
 				</form>
-
-				<% } else { %>
-					<form class="form-inline" action="/login" method="post" style="text-align:right;">
-						<input class="form-control mr-sm-2" name="username" id="username" type="text" placeholder="Username"
-							style="width: 200px" />
-						<button class="btn btn-default" type="submit" style="border-color:black">Login</button>
-					</form>
-					<% } %>
+				<% } %>
 	</nav>
 </header>
