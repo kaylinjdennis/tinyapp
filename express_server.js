@@ -79,7 +79,7 @@ app.post('/login', (req, res) => {
   }
   if (password !== users[userID].password) {
     res.statusCode = 403;
-    throw new Error(`Incorrect Email or Password.\nStatus code: ${res.statusCode}`);
+    throw new Error(`Incorrect Password.\nStatus code: ${res.statusCode}`);
   }
   res.cookie('user_id', userID);
   res.redirect('/urls');
