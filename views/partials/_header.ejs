@@ -17,15 +17,16 @@
 			<div class="navbar-nav">
 				<a class="nav-item">Logged In As: <%= user['email'] %>! &nbsp&nbsp</a>
 			</div>
-			<form class="form-inline" action="/logout" method="post" style="text-align:right;">
+			<form class="form-inline" action="/logout" method="post">
 				<button class="btn btn-default" type="submit" style="border-color:black">Logout</button>
 			</form>
 			<% } else { %>
-				<form class="form-inline" action="/login" method="post" style="text-align:right;">
-					<input class="form-control mr-sm-2" name="email" id="email" type="text" placeholder="Email"
-						style="width: 200px" />
-					<button class="btn btn-default" type="submit" style="border-color:black">Login</button>
-				</form>
+				<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+					<div class="navbar-nav">
+						<a class="nav-item nav-link" href="/login">Login</a>
+						<a class="nav-item nav-link" href="/register">Register</a>
+					</div>
+				</div>
 				<% } %>
 	</nav>
 </header>

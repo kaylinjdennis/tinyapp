@@ -133,6 +133,12 @@ app.get('/register', (req, res) => {
   res.render('register', templateVars);
 });
 
+app.get('/login', (req, res) => {
+  const user = users[req.cookies['user_id']];
+  const templateVars = { user, urls: urlDatabase };
+  res.render('login', templateVars);
+});
+
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
