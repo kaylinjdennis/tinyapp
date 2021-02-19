@@ -4,6 +4,7 @@ const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const { getUserByEmail } = require('./helpers');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
@@ -38,16 +39,6 @@ const generateRandomString = () => {
     result += characters[Math.floor(Math.random() * characters.length)];
   }
   return result;
-};
-
-const getUserByEmail = (email, database) => {
-  let correctUser;
-  for (let user in database) {
-    if (database[user].email === email) {
-      correctUser = database[user];
-    }
-  }
-  return correctUser;
 };
 
 const urlsForUser = (id) => {
