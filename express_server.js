@@ -68,6 +68,11 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls');
 });
 
+app.get('/urls/:shortURL/delete', (req, res) => {
+  console.log(urlDatabase);
+  res.redirect('/urls');
+});
+
 app.post('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   if (req.body.longURL) {
@@ -125,7 +130,6 @@ app.post('/register', (req, res) => {
 app.get('/urls/new', (req, res) => {
   if (!req.cookies['user_id']) {
     res.redirect('/login');
-    return;
   }
   const user = users[req.cookies['user_id']];
   const urls = urlsForUser(user);
@@ -135,8 +139,13 @@ app.get('/urls/new', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.cookies['user_id']];
+  let allowed;
+  if (user) {
+    allowed = (user.id === urlDatabase[req.params.shortURL].userID);
+  }
   const templateVars = {
     user,
+    allowed,
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL
   };
