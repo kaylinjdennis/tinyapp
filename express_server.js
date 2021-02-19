@@ -31,6 +31,7 @@ const users = {
   }
 };
 
+// Generates a random alpha-numeric string to be used as url id or user id.
 const generateRandomString = () => {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -41,6 +42,7 @@ const generateRandomString = () => {
   return result;
 };
 
+// Takes in a user id as an argument and returns an object of all urls belonging to that user.
 const urlsForUser = (id) => {
   const urls = {};
   for (let url in urlDatabase) {
@@ -51,6 +53,9 @@ const urlsForUser = (id) => {
   return urls;
 };
 
+
+// POST REQUESTS
+//
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {};
@@ -59,40 +64,21 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
-});
-
-app.get('/urls/:shortURL/delete', (req, res) => {
-  res.redirect('/urls');
-});
-
 app.post('/urls/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   if (req.body.longURL) {
     urlDatabase[shortURL].longURL = req.body.longURL;
   }
-  res.redirect(`/urls/${shortURL}`);
-});
-
-app.post('/login', (req, res) => {
-  const email = req.body.email;
-  const user = getUserByEmail(email, users);
-  if (!user) {
-    res.status(403).send('No account associated with email.');
-  }
-  const hashedPassword = users[user].password;
-  if (!bcrypt.compareSync(req.body.password, hashedPassword)) {
-    res.status(403).send('Password incorrect');
-  }
-  req.session.user_id = user;
   res.redirect('/urls');
 });
 
-app.post('/logout', (req, res) => {
-  req.session = null;
+app.post('/urls/:shortURL/delete', (req, res) => {
+  if (!req.session.user_id) {
+    return res.status(400).send('Not Logged in.');
+  }
+  delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
+
 });
 
 app.post('/register', (req, res) => {
@@ -114,6 +100,27 @@ app.post('/register', (req, res) => {
   }
 });
 
+app.post('/login', (req, res) => {
+  const email = req.body.email;
+  const user = getUserByEmail(email, users);
+  if (!user) {
+    res.status(403).send('No account associated with email.');
+  }
+  const hashedPassword = users[user].password;
+  if (!bcrypt.compareSync(req.body.password, hashedPassword)) {
+    res.status(403).send('Password incorrect');
+  }
+  req.session.user_id = user;
+  res.redirect('/urls');
+});
+
+app.post('/logout', (req, res) => {
+  req.session = null;
+  res.redirect('/urls');
+});
+
+
+// GET REQUESTS
 app.get('/urls/new', (req, res) => {
   if (!req.session.user_id) {
     res.redirect('/login');
@@ -142,9 +149,13 @@ app.get('/urls/:shortURL', (req, res) => {
 app.get('/login', (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = { user, urls: urlDatabase };
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  }
   res.render('login', templateVars);
 });
 
+// Page that displays all of the users urls
 app.get('/urls', (req, res) => {
   const user = users[req.session.user_id];
   let urls = {};
@@ -155,9 +166,13 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
+// Handles registering a new user
 app.get('/register', (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = { user, urls: urlDatabase };
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  }
   res.render('register', templateVars);
 });
 
@@ -172,13 +187,16 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b>World</b></body></html>\n');
-});
-
+// Takes you to the webpage of the longURL
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
+});
+
+// Delete specified URL from urlDatabase and redirect to /urls
+app.get('/urls/:shortURL/delete', (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
