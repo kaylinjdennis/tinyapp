@@ -82,11 +82,11 @@ app.post('/login', (req, res) => {
   if (!user) {
     res.status(403).send('No account associated with email.');
   }
-  const hashedPassword = users[user.id].password;
+  const hashedPassword = users[user].password;
   if (!bcrypt.compareSync(req.body.password, hashedPassword)) {
     res.status(403).send('Password incorrect');
   }
-  req.session.user_id = user.id;
+  req.session.user_id = user;
   res.redirect('/urls');
 });
 

@@ -2,7 +2,7 @@ const getUserByEmail = (email, database) => {
   let correctUser;
   for (let user in database) {
     if (database[user].email === email) {
-      correctUser = database[user];
+      correctUser = database[user].id;
     }
   }
   return correctUser;
