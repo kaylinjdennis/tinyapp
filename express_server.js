@@ -84,7 +84,6 @@ app.post('/urls/:shortURL', (req, res) => {
 
 app.post('/login', (req, res) => {
   const email = req.body.email;
-  const password = req.body.password;
   let userID;
   if (!emailInUsers(email)) {
     res.statusCode = 403;
@@ -95,7 +94,8 @@ app.post('/login', (req, res) => {
       userID = user;
     }
   }
-  if (password !== users[userID].password) {
+  const hashedPassword = users[userID].password;
+  if (!bcrypt.compareSync(req.body.password, hashedPassword)) {
     res.statusCode = 403;
     throw new Error(`Incorrect Password.\nStatus code: ${res.statusCode}`);
   }
@@ -117,10 +117,11 @@ app.post('/register', (req, res) => {
     res.statusCode = 400;
     throw new Error(`There is already an account associated with this email.\nStatus code: ${res.statusCode}`);
   } else {
+    const hashedPassword = bcrypt.hashSync(req.body.password, 10);
     const newUser = {
       id: newUserID,
       email: req.body.email,
-      password: req.body.password
+      password: hashedPassword
     };
     users[newUserID] = newUser;
     res.cookie('user_id', newUserID);
